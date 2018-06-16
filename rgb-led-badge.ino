@@ -72,14 +72,14 @@ void check_button_state()
   }
 }
 
-int red (int x) {
+int red (unsigned int x) {
   int y = x % 48;
   if (y > 15) y = 31 - y;
   return max(y, 0);
 }
 
-int green (int x) { return red(x + 32); }
-int blue (int x) { return red(x + 64); }
+int green (unsigned int x) { return red(x + 32); }
+int blue (unsigned int x) { return red(x + 64); }
 
 // These could probably operate from a single array, with some creative indexing
 const int Flasher[2][16] PROGMEM = { 
@@ -149,4 +149,6 @@ void loop () {
       break;
   }
   Step++;
+  // Prevent overflow
+  Step = Step % 32768;
 }
