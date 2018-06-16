@@ -81,7 +81,7 @@ int red (int x) {
 int green (int x) { return red(x + 32); }
 int blue (int x) { return red(x + 64); }
 
-// These could probably operate from a single array, with some creating indexing
+// These could probably operate from a single array, with some creative indexing
 const int Flasher[2][16] PROGMEM = { 
   {0xF00, 0x000, 0xF00, 0x000, 0xF00, 0x000, 0xF00, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000 , 0x000},
   {0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x00F, 0x000, 0x00F, 0x000, 0x00F, 0x000, 0x00F , 0x000},
@@ -97,47 +97,52 @@ const byte Heart[Heart_Size] PROGMEM = {0x00, 0x02, 0x04, 0x08, 0x0A, 0x0C, 0x0E
                                         0x0C, 0x0A, 0x08, 0x06, 0x04, 0x02,
                                         0x00, 0x00, 0x00, 0x00, 0x00};
 
-
 void loop () {
   check_button_state();
   switch (Mode)
   { 
     case 0:
+      // Slow rainbow fade
       for (int i=0; i<2; i++) {
         Buffer[i] = red(Step + i*12)<<8 | green(Step + i*12)<<4 | blue(Step + i*12);
       }
       delay(200);
       break;
     case 1:
+      // Fast rainbow fade
       for (int i=0; i<2; i++) {
         Buffer[i] = red(Step + i*12)<<8 | green(Step + i*12)<<4 | blue(Step + i*12);
       }
       delay(50);
       break;
     case 2:
+      // Police flasher #1
       for (int i=0; i<2; i++) {
           Buffer[i] = pgm_read_word(&Flasher[i][(Step) % 16]);
       }
       delay(100);
       break;
     case 3:
+      // Police flasher #2
       for (int i=0; i<2; i++) {
           Buffer[i] = pgm_read_word(&Flasher2[i][(Step) % 16]);
       }
       delay(100);
       break;
     case 4:
+      // Version 1
       Buffer[0] = 0xFFF;
       Buffer[1] = 0xFFF;
       delay(200);
       break;
     case 5:
-      //Buffer[0] = Heart[Step % 16]<<8;
+      // Beating heart
       Buffer[0] = pgm_read_byte(&Heart[(Step % Heart_Size)]) << 8;
       Buffer[1] = Buffer[0];
       delay(100);
       break;
     case 6:
+      // Slow red fade
       Buffer[0] = red(Step)<<8;
       Buffer[1] = Buffer[0];
       delay(200);
