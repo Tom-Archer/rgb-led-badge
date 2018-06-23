@@ -4,20 +4,20 @@ volatile int Buffer[4] = { 0x000, 0x000, 0x000, 0x000 };
 void DisplaySetup () {
   // ATtiny85
   // Set up Timer/Counter1 to multiplex the display
-  //TCCR1 = 1<<CTC1 | 7<<CS10;    // CTC mode; prescaler 64
-  //OCR1C = 24;                   // Divide by 25 -> 78Hz
-  //TIMSK = TIMSK | 1<<OCIE1A;    // Enable overflow interrupt
+  TCCR1 = 1<<CTC1 | 7<<CS10;    // CTC mode; prescaler 64
+  OCR1C = 24;                   // Divide by 25 -> 78Hz
+  TIMSK = TIMSK | 1<<OCIE1A;    // Enable overflow interrupt
 
   // ATmega328P
   // Set up Timer/Counter2 to multiplex the display
-  TCCR2A = 0;                      // Reset TCCR0A
-  TCCR2B = 0;                      // Reset TCCR0B
-  TCNT2  = 0;                      // Reset TCNT2
+  //TCCR2A = 0;                      // Reset TCCR0A
+  //TCCR2B = 0;                      // Reset TCCR0B
+  //TCNT2  = 0;                      // Reset TCNT2
   
-  TCCR2A |= (1 << WGM21);          // CTC mode
-  TCCR2B |= (5 << CS20);           // prescaler 128
-  OCR2A = 24;                      // Divide by 25 -> 78Hz
-  TIMSK2 |= (1 << OCIE2A);         // Enable overflow interrupt
+  //TCCR2A |= (1 << WGM21);          // CTC mode
+  //TCCR2B |= (5 << CS20);           // prescaler 128
+  //OCR2A = 24;                      // Divide by 25 -> 78Hz
+  //TIMSK2 |= (1 << OCIE2A);         // Enable overflow interrupt
 } 
 
 void setup() {
@@ -37,15 +37,19 @@ void DisplayNextRow() {
   int r = rgb>>8 & 0x0F;
   int g = rgb>>4 & 0x0F;
   int b = rgb & 0x0F;
-  int bits = (count < g) | (count < r)<<1 | (count < b)<<2;
+  int bits = (count < b) | (count < r)<<1 | (count < g)<<2;
   bits = bits + (bits & 0x07<<led);
   DDRB = (DDRB & 0xF0) | bits;
   PORTB = (PORTB & 0xF0) | bits;
   DDRB = DDRB | 1<<led;
 }
 
-// Timer/Counter2 interrupt
-ISR(TIMER2_COMPA_vect) {
+// Timer/Counter2 interrupt - ATmega328P
+//ISR(TIMER2_COMPA_vect) {
+//  DisplayNextRow();
+//}
+// Timer/Counter1 interrupt - ATtiny85
+ISR(TIM1_COMPA_vect) {
   DisplayNextRow();
 }
 
