@@ -29,18 +29,28 @@ void setup() {
 
 void DisplayNextRow() {
   static int cycle = 0;
+  // Turn off the LED from the last cycle
   DDRB = DDRB & ~(1<<(cycle & 0x03));
-  cycle = (cycle + 1) & 0x3F;   // 64 cycles
+  // Get the current cycle (0-63)
+  cycle = (cycle + 1) & 0x3F;
+  // Get the current LED number (0-3) 
+  // Each LED is updated 16 times every 64 cycles
   int led = cycle & 0x03;
+  // Get LED update number (0-15)
   int count = cycle>>2;
+  // Read the RGB values from the buffer
   int rgb = Buffer[led];
   int r = rgb>>8 & 0x0F;
   int g = rgb>>4 & 0x0F;
   int b = rgb & 0x0F;
+  // Determine whether each RGB value should be on (1) or off (0)
   int bits = (count < b) | (count < r)<<1 | (count < g)<<2;
   bits = bits + (bits & 0x07<<led);
+  // Set anodes to output
   DDRB = (DDRB & 0xF0) | bits;
+  // Set anodes to high
   PORTB = (PORTB & 0xF0) | bits;
+  // Set cathode to low
   DDRB = DDRB | 1<<led;
 }
 
