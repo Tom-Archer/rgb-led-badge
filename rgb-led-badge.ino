@@ -65,7 +65,7 @@ ISR(TIM1_COMPA_vect) {
 
 unsigned int Step = 0;
 int Mode = 0;
-int Num_Modes = 7;
+int Num_Modes = 10;
 bool Switch_On = false;
 
 void check_button_state()
@@ -150,12 +150,30 @@ void loop () {
       delay(200);
       break;
     case 5:
+      // Red
+      Buffer[0] = 0xF00;
+      Buffer[1] = 0xF00;
+      delay(200);
+      break;
+    case 6:
+      // Green
+      Buffer[0] = 0x0F0;
+      Buffer[1] = 0x0F0;
+      delay(200);
+      break;
+    case 7:
+      // Blue
+      Buffer[0] = 0x00F;
+      Buffer[1] = 0x00F;
+      delay(200);
+      break;
+    case 8:
       // Beating heart
       Buffer[0] = pgm_read_byte(&Heart[(Step % Heart_Size)]) << 8;
       Buffer[1] = Buffer[0];
       delay(100);
       break;
-    case 6:
+    case 9:
       // Slow red fade
       Buffer[0] = red(Step)<<8;
       Buffer[1] = Buffer[0];
